@@ -25,6 +25,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let allImages = [];
 
+    // --------------- Safe JSON Parser ---------------
+    async function safeJson(response) {
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+            return response.json();
+        }
+        throw new Error(`Server error ${response.status}: ${response.statusText || "Unexpected response"}`);
+    }
+
     // --------------- Character Counter ---------------
     promptInput.addEventListener("input", () => {
         charCount.textContent = promptInput.value.length;
@@ -68,17 +77,31 @@ document.addEventListener("DOMContentLoaded", () => {
         emptyState.classList.add("hidden");
 
         try {
-            const response = await fetch("/api/generate", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    prompt: prompt,
-                    num_images: parseInt(numImages.value),
-                    aspect_ratio: aspectRatio.value,
-                }),
-            });
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout
 
-            const data = await response.json();
+            let response;
+            try {
+                response = await fetch("/api/generate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        num_images: parseInt(numImages.value),
+                        aspect_ratio: aspectRatio.value,
+                    }),
+                    signal: controller.signal,
+                });
+            } catch (fetchErr) {
+                if (fetchErr.name === "AbortError") {
+                    throw new Error("Request timed out. Please try again.");
+                }
+                throw new Error("Cannot reach the server. Make sure the app is running.");
+            } finally {
+                clearTimeout(timeoutId);
+            }
+
+            const data = await safeJson(response);
 
             if (!response.ok) {
                 throw new Error(data.error || "Something went wrong.");
@@ -184,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadGallery() {
         try {
             const response = await fetch("/api/gallery");
-            const data = await response.json();
+            const data = await safeJson(response);
 
             if (data.images && data.images.length > 0) {
                 allImages = data.images;
