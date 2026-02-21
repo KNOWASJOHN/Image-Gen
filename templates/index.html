@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Generate stunning images using Google Imagen 4 AI. Type a prompt and create beautiful AI-generated artwork instantly.">
+    <title>Mystic AI — Image Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <!-- Animated background orbs -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#a78bfa" />
+                                <stop offset="50%" stop-color="#6366f1" />
+                                <stop offset="100%" stop-color="#ec4899" />
+                            </linearGradient>
+                        </defs>
+                        <rect x="2" y="2" width="28" height="28" rx="8" stroke="url(#logoGrad)" stroke-width="2.5"
+                            fill="none" />
+                        <circle cx="12" cy="12" r="3" fill="url(#logoGrad)" />
+                        <path d="M6 24 L12 16 L18 20 L22 14 L28 24" stroke="url(#logoGrad)" stroke-width="2" fill="none"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Mystic AI</h1>
+                    <span class="logo-subtitle">AI Image Generator</span>
+                </div>
+            </div>
+            <div class="header-badge">
+                <span class="badge-dot"></span>
+                Powered by Freepik
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Prompt Section -->
+            <section class="prompt-section glass-panel" id="prompt-section">
+                <div class="section-header">
+                    <h2>Create Your Vision</h2>
+                    <p>Describe what you want to see — Mystic AI will bring it to life</p>
+                </div>
+
+                <div class="prompt-form" id="prompt-form">
+                    <div class="textarea-wrapper">
+                        <textarea id="prompt-input"
+                            placeholder="A serene Japanese garden at sunset with cherry blossoms floating over a koi pond, painted in watercolor style..."
+                            rows="3" maxlength="480"></textarea>
+                        <div class="char-count">
+                            <span id="char-count">0</span> / 480
+                        </div>
+                    </div>
+
+                    <div class="controls-row">
+                        <div class="control-group">
+                            <label for="num-images">Images</label>
+                            <div class="select-wrapper">
+                                <select id="num-images">
+                                    <option value="1">1 image</option>
+                                    <option value="2" selected>2 images</option>
+                                    <option value="3">3 images</option>
+                                    <option value="4">4 images</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="aspect-ratio">Aspect Ratio</label>
+                            <div class="select-wrapper">
+                                <select id="aspect-ratio">
+                                    <option value="1:1" selected>1:1 Square</option>
+                                    <option value="4:3">4:3 Landscape</option>
+                                    <option value="3:4">3:4 Portrait</option>
+                                    <option value="16:9">16:9 Widescreen</option>
+                                    <option value="9:16">9:16 Vertical</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="button" id="generate-btn" class="generate-btn">
+                            <span class="btn-content">
+                                <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                                </svg>
+                                Generate
+                            </span>
+                            <span class="btn-loading">
+                                <div class="spinner"></div>
+                                Generating...
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Message -->
+            <div class="error-toast" id="error-toast">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                    <line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+                <span id="error-message"></span>
+                <button class="toast-close" id="error-close">&times;</button>
+            </div>
+
+            <!-- Gallery Section -->
+            <section class="gallery-section" id="gallery-section">
+                <div class="gallery-header">
+                    <h2>Generated Images</h2>
+                    <span class="image-count" id="image-count"></span>
+                </div>
+
+                <!-- Loading State -->
+                <div class="generation-loading" id="generation-loading">
+                    <div class="loading-cards">
+                        <div class="skeleton-card"></div>
+                        <div class="skeleton-card"></div>
+                    </div>
+                    <p class="loading-text">Creating your images with Mystic AI...</p>
+                    <div class="loading-progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                </div>
+
+                <!-- Image Grid -->
+                <div class="image-grid" id="image-grid"></div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state">
+                    <div class="empty-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                    </div>
+                    <h3>No images yet</h3>
+                    <p>Type a prompt above and click Generate to create your first image</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Built with <span class="heart">♥</span> using Freepik Mystic AI & Flask</p>
+        </footer>
+    </div>
+
+    <!-- Image Modal / Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightbox-close">&times;</button>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="Full size image">
+        </div>
+        <div class="lightbox-actions">
+            <a id="lightbox-download" href="" download class="lightbox-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download
+            </a>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>
