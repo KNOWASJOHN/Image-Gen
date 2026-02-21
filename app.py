@@ -39,6 +39,14 @@ def freepik_headers():
     }
 
 
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"error": "Not found"}), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({"error": "Internal server error"}), 500
+
 @app.route("/")
 def index():
     """Serve the main web UI."""
@@ -191,4 +199,4 @@ def gallery():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000, use_reloader=False)
